@@ -15,27 +15,33 @@
     'NATURAL':'Тактильная фактура и натуральное покрытие',
     'SOFT TOUCH':'Серия SOFT TOUCH',
     'MIRROR STANDART':'Зеркальная панель, исполнение STANDART'};
+  // образцы текстур для квадратиков в кнопках: серия -> типичная текстура; направление внутри серии -> своя
+  var SW={'Древесная':'natural-212003','Металлическая':'mirror-standart-712','Каменная':'standart-5301','Тканевая':'natural-2066','Однотонная':'standart-1013ral','Кожаная':'standart-625705-18','Soft touch':'soft-touch-4027'};
+  var SWD={'Древесная|Natural':'natural-212003','Древесная|Standart':'standart-8004','Однотонная|Natural':'natural-101','Однотонная|Standart':'standart-1013ral','Тканевая|Natural':'natural-2066','Тканевая|Standart':'standart-6011','Кожаная|Natural':'natural-9002','Кожаная|Standart':'standart-625705-18'};
+  var ALL4=['natural-212003','mirror-standart-712','standart-5301','standart-625705-18'];
+  function sw(id){return '<img class="sw" src="'+B+'img/sw/'+id+'.jpg" width="24" height="24" alt="" aria-hidden="true">'}
+  function sw4(){return '<span class="sw4" aria-hidden="true">'+ALL4.map(function(i){return '<img src="'+B+'img/sw/'+i+'.jpg" alt="">'}).join('')+'</span>'}
   var serie='Все',dir='Все',q='';
   var grid=d.getElementById('cgrid'),fs=d.getElementById('fSeries'),fl=d.getElementById('fLine'),cnt=d.getElementById('count'),intro=d.getElementById('intro');
   function match(t){return !q||(t.art+' '+t.line).toLowerCase().indexOf(q)>-1}
   function cntBy(f){return T.filter(function(t){return match(t)&&f(t)}).length}
-  function chip(label,on,fn,n){var b=d.createElement('button');b.className='chip'+(on?' on':'');b.innerHTML=label+(n!=null?'<small>'+n+'</small>':'');b.onclick=fn;return b}
+  function chip(label,on,fn,n,icon){var b=d.createElement('button');b.className='chip'+(on?' on':'');b.innerHTML=(icon||'')+'<span>'+label+'</span>'+(n!=null?'<small>'+n+'</small>':'');b.onclick=fn;return b}
   function drawFilters(){
     fs.innerHTML='';fl.innerHTML='';
-    fs.appendChild(chip('Все',serie==='Все',function(){serie='Все';dir='Все';render()},cntBy(function(){return true})));
+    fs.appendChild(chip('Все',serie==='Все',function(){serie='Все';dir='Все';render()},cntBy(function(){return true}),sw4()));
     SERIES.forEach(function(s){
       var n=cntBy(function(t){return t.series===s});
       if(!n&&serie!==s)return;
-      fs.appendChild(chip(s,serie===s,function(){serie=s;dir='Все';render()},n));
+      fs.appendChild(chip(s,serie===s,function(){serie=s;dir='Все';render()},n,sw(SW[s])));
     });
     var ds=DIRS.filter(function(x){return T.some(function(t){return t.series===serie&&t.dir===x})});
     if(serie==='Все'||ds.length<2){fl.style.display='none';dir='Все';return}
     fl.style.display='';
-    fl.appendChild(chip('Все',dir==='Все',function(){dir='Все';render()},cntBy(function(t){return t.series===serie})));
+    fl.appendChild(chip('Все',dir==='Все',function(){dir='Все';render()},cntBy(function(t){return t.series===serie}),sw(SW[serie])));
     ds.forEach(function(x){
       var n=cntBy(function(t){return t.series===serie&&t.dir===x});
       if(!n&&dir!==x)return;
-      fl.appendChild(chip(x,dir===x,function(){dir=x;render()},n));
+      fl.appendChild(chip(x,dir===x,function(){dir=x;render()},n,sw(SWD[serie+'|'+x]||SW[serie])));
     });
   }
   function list(){
